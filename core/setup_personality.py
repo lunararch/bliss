@@ -1,4 +1,4 @@
-from core.personality import PersonalityLoader
+from personality import PersonalityLoader
 
 def setup_personality(personality_name: str = "default") -> PersonalityLoader:
     loader = PersonalityLoader()
@@ -17,9 +17,9 @@ def get_personality_enhanced_prompt(user_input: str, personality_loader: Persona
 
 if __name__ == "__main__":
     personality = setup_personality("default")
-    
+
     user_message = "Hello, how are you today?"
     ai_prompt = get_personality_enhanced_prompt(user_message, personality)
-    
+
     print("Complete AI prompt:")
     print(ai_prompt)

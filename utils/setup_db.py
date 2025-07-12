@@ -13,7 +13,7 @@ def setup_database():
         print("❌ Failed to create database")
         return False
     
-        return True
+    return True
 
 if __name__ == "__main__":
     setup_database()

@@ -12,7 +12,8 @@ class ConversationMemory:
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
 
         with sqlite3.connect(self.db_path) as conn:
-            cursor = conn.cursor(
+            cursor = conn.cursor()
+            cursor.execute(
                 '''
                 create table if not exists conversations (
                     id integer primary key autoincrement,
