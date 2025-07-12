@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Any
 class PersonalityLoader:
     def __init__(self, personalities_dir: str = "data/personalities"):
         self.personalities_dir = personalities_dir
-        self.current_personality: None
+        self.current_personality = None
 
     def load_personality(self, personality_name: str = "default") -> Dict[str, Any]:
         file_path = os.path.join(self.personalities_dir, f"{personality_name}.json") 
@@ -215,6 +215,8 @@ class PersonalityLoader:
         return {
             "name": self.current_personality.get("name"),
             "age": self.current_personality.get("age"),
+            "gender": self.current_personality.get("gender"),
+            "sexuality": self.current_personality.get("sexuality"),
             "description": self.current_personality.get("description"),
             "background": self.current_personality.get("background"),
             "occupation": self.current_personality.get("occupation"),
