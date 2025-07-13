@@ -124,3 +124,73 @@ class TextToSpeech:
             pass
         
         return voices
+    
+    def set_voice(self, voice_id: str):
+        """Set the voice by ID."""
+        if self.engine:
+            try:
+                self.engine.setProperty('voice', voice_id)
+            except Exception as e:
+                st.warning(f"Could not set voice: {e}")
+    
+    def is_available(self) -> bool:
+        """
+        Check if TTS is available.
+        
+        Returns:
+            bool: True if TTS engine is initialized, False otherwise
+        """
+        return self.engine is not None
+    
+    def save_to_file(self, text: str, filename: str) -> bool:
+        """
+        Save text to an audio file.
+        
+        Args:
+            text: Text to convert to speech
+            filename: Path to save the audio file
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        if not self.engine or not text.strip():
+            st.error("Text-to-Speech engine is not initialized or text is empty.")
+            return False
+        
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
+                self.engine.save_to_file(text, temp_file.name)
+                self.engine.runAndWait()
+                os.rename(temp_file.name, filename)
+            
+            st.success(f"Audio saved to {filename}.")
+            return True
+        except Exception as e:
+            st.error(f"Failed to save audio file: {e}")
+            return False
+        
+def create_text_to_speech() -> TextToSpeech:
+    """
+    Create and return a TextToSpeech instance.
+    
+    Returns:
+        TextToSpeech: Instance of TextToSpeech
+    """
+    return TextToSpeech()
+
+if __name__ == "__main__":
+    tts = create_text_to_speech()
+    
+    if tts.is_available():
+        print("TTS available. Testing...")
+        
+        voices = tts.get_voices()
+        print(f"Available voices: {len(voices)}")
+        for voice in voices[:3]:  # Show first 3 voices
+            print(f"  - {voice['name']} ({voice['id']})")
+        
+        test_text = "Hello! This is a test of the text to speech system."
+        print(f"Speaking: {test_text}")
+        tts.speak(test_text)
+    else:
+        print("TTS not available")
