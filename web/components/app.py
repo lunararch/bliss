@@ -128,8 +128,12 @@ with st.sidebar:
         st.write(f"**Sexuality:** {personality_info.get('sexuality', 'Unknown')}")
         st.write(f"**Description:** {personality_info.get('description', 'No description')}")
 
-    
-st.title("💬 BLISS")
+
+personality_info = st.session_state.ai_client.get_current_personality_info()
+if personality_info and personality_info.get('name'):
+    st.title("💬 {}".format(personality_info.get('name')))
+else:
+    st.title("💬 Bliss")
 
 if st.session_state.voice_enabled and st.session_state.stt.is_microphone_available():
     col1, col2 = st.columns([3, 1])
