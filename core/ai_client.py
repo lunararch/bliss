@@ -51,13 +51,19 @@ class OllamaClient:
                 options={
                     'temperature': 0.7,
                     'top_p': 0.9,
-                    'num_predict': 500
+                    'num_predict': 1000
                 }
             )
             
             ai_response = response['message']['content'].strip()
+
+            if ai_response.startswith("<think>") and "</think>" in ai_response:
+                end_index = ai_response.index("</think>") + len("</think>")
+                ai_response = ai_response[end_index:].strip()
             
             self.memory.save_conversation(user_input, ai_response, session_id)
+
+            
             
             return ai_response
             
@@ -219,6 +225,43 @@ class OllamaClient:
             import traceback
             traceback.print_exc()
             return False
+    
+    def summarize_conversation(self, session_id: str = "default", context_limit: int = 20) -> str:
+        """
+        Summarize the recent conversation for a session.
+        Args:
+            session_id (str): Session identifier
+            context_limit (int): Number of recent messages to include in summary
+            
+        Returns:
+            str: Summary of the conversation
+        """
+        conversation_context = self.memory.get_recent_conversations(context_limit, session_id)
+        messages = []
+        for user_msg, assistant_msg, timestamp in conversation_context:
+            messages.append(f"User: {user_msg}\nAssistant: {assistant_msg}")
+        conversation_text = "\n".join(messages)
+
+        prompt = (f"Summarize the following conversation between you and the user in a few sentences:\n\n"
+                f"{conversation_text}"
+        )
+        response = self.client.chat(
+            model = self.model_name,
+            messages=[{"role": "user", "content": prompt}],
+            options={
+                'temperature': 0.7,
+                'top_p': 0.9,
+                'num_predict': 500
+            }
+        )
+
+        ai_response = response['message']['content'].strip()
+
+        if ai_response.startswith("<think>") and "</think>" in ai_response:
+            end_index = ai_response.index("</think>") + len("</think>")
+            ai_response = ai_response[end_index:].strip()
+
+        return ai_response
 
 def create_ai_client(model_name: str = "mistral") -> OllamaClient:
     """
@@ -231,6 +274,7 @@ def create_ai_client(model_name: str = "mistral") -> OllamaClient:
         OllamaClient: Configured client instance
     """
     return OllamaClient(model_name)
+
 
 if __name__ == "__main__":
     print("Starting AI Client test...")

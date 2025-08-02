@@ -116,6 +116,18 @@ with st.sidebar:
         greeting = st.session_state.ai_client.get_greeting(st.session_state.current_personality)
         st.session_state.messages.append({"role": "assistant", "content": greeting})
 
+    if st.button("Summarize Conversation"):
+        with st.spinner("Generating summary..."):
+            try:
+                summary = st.session_state.ai_client.summarize_conversation(
+                    session_id = st.session_state.session_id,
+                    context_limit=10
+                )
+                st.session_state.messages.append({"role": "assistant", "content": summary})
+                st.success("Summary generated successfully!")
+            except Exception as e:
+                st.error(f"Failed to Summarize: {e}")
+
     conv_count = st.session_state.ai_client.get_conversation_count(st.session_state.session_id)
     st.metric("Conversations", conv_count)
 
